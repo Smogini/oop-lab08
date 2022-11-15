@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
 
@@ -45,6 +46,16 @@ public class BadIOGUI {
         canvas.add(write, BorderLayout.CENTER);
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        /* Part 1 */
+        final JPanel newCanvas = new JPanel();
+        newCanvas.setLayout(new BoxLayout(newCanvas, BoxLayout.LINE_AXIS));
+        canvas.add(newCanvas, BorderLayout.CENTER);
+        newCanvas.add(write);
+
+        /* Part 2 */
+        final JButton read = new JButton("Read from file");
+        newCanvas.add(read);
         /*
          * Handlers
          */
@@ -63,6 +74,19 @@ public class BadIOGUI {
                 } catch (IOException e1) {
                     JOptionPane.showMessageDialog(frame, e1, "Error", JOptionPane.ERROR_MESSAGE);
                     e1.printStackTrace(); // NOPMD: allowed as this is just an exercise
+                }
+            }
+        });
+
+        read.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent arg0) {
+                // System.out.println("Prova");
+                try {
+                    final List<String> contents = Files.readAllLines(Paths.get(PATH), StandardCharsets.UTF_8);
+                    System.out.println(contents.toString()); // NOPMD: allowed as this is just an exercise
+                } catch (IOException e) {
+                    System.out.println("Error: " + e.getMessage()); // NOPMD: allowed as this is just an exercise
                 }
             }
         });
@@ -87,6 +111,8 @@ public class BadIOGUI {
          * on screen. Results may vary, but it is generally the best choice.
          */
         frame.setLocationByPlatform(true);
+
+        frame.pack();
         /*
          * OK, ready to push the frame onscreen
          */
