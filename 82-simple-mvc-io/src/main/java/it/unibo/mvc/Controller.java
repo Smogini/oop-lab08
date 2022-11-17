@@ -9,10 +9,8 @@ import java.nio.charset.StandardCharsets;
  * Application controller. Performs the I/O.
  */
 public class Controller {
-    private static final String PATH = System.getProperty("user.home")
-                                 + System.getProperty("file.separator")
-                                 + "output.txt";
-    private File file = new File(PATH);
+    private File file = new File(System.getProperty("user.home") + System.getProperty("file.separator") + DEAFULT_NAME);
+    private static final String DEAFULT_NAME = "output.txt";
 
     /**
      *  Setting a File as current file. 
@@ -35,14 +33,14 @@ public class Controller {
      *  @return the file path.
      */
     public String getPath() {
-        return this.file.getPath();
+        return file.getAbsolutePath();
     }
 
     /** 
      *  Gets a `String` as input and saves its content on the current file. 
      *  @param content
      */
-    public void saveString(final String content) {
+    public void saveString(final String content) throws IOException {
         try (PrintStream ps = new PrintStream(this.file, StandardCharsets.UTF_8)) {
             ps.print(content);
         } catch (final IOException e) {
