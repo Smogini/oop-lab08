@@ -45,6 +45,7 @@ public final class SimpleController implements Controller {
         if (this.nextString == null) {
             throw new IllegalStateException("The string is not set");
         }
+        this.stringHistory.add(this.nextString);
         System.out.println(this.nextString); // NOPMD: allowed in exercises
     }
 }
