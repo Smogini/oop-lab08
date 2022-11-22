@@ -1,16 +1,15 @@
 package it.unibo.mvc;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  */
 public final class DrawNumberApp implements DrawNumberViewObserver {
-    private static final int MIN = 0;
-    private static final int MAX = 100;
-    private static final int ATTEMPTS = 10;
-
     private final DrawNumber model;
     private final List<DrawNumberView> views;
 
@@ -18,7 +17,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
      * @param views
      *            the views to attach
      */
-    public DrawNumberApp(final DrawNumberView... views) {
+    public DrawNumberApp(final String file, final DrawNumberView... views) {
         /*
          * Side-effect proof
          */
@@ -27,7 +26,42 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             view.setObserver(this);
             view.start();
         }
-        this.model = new DrawNumberImpl(MIN, MAX, ATTEMPTS);
+        Configuration.Builder builder = new Configuration.Builder();
+        try (final BufferedReader reader = new BufferedReader(new FileReader(file));) {
+            String line;
+            String[] arr;
+            int val;
+            while ((line = reader.readLine()) != null) {
+                arr = line.split(": ");
+                val = Integer.valueOf(arr[1]);
+                if (arr[0].contains("max")) {
+                    builder.setMax(val);
+                } else if (arr[0].contains("min")) {
+                    builder.setMin(val);
+                } else if (arr[0].contains("attempts")) {
+                    builder.setAttempts(val);
+                } else {
+                    displayError("Cannot understand the values in " + file);
+                }
+            }
+            reader.close();
+        } catch (final IOException e) {
+            displayError(e.getMessage());
+        }
+        final Configuration config = builder.build();
+        System.out.println(config.getAttempts() + " " + config.getMax() + " " + config.getMin());
+        if (config.isConsistent()) {
+           this.model = new DrawNumberImpl(config);
+        } else {
+            displayError("Configuration file is inconsistend. Using default settings");
+            this.model = new DrawNumberImpl(new Configuration.Builder().build());
+        }
+    }
+
+    private void displayError(final String message) {
+        for (final var err : views) {
+            err.displayError(message);
+        }
     }
 
     @Override
@@ -66,7 +100,9 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
      * @throws FileNotFoundException 
      */
     public static void main(final String... args) throws FileNotFoundException {
-        new DrawNumberApp(new DrawNumberViewImpl());
+        new DrawNumberApp("src/main/resources/config.yml", 
+                            new DrawNumberViewImpl(),
+                            new DrawNumberViewImpl(),
+                            new PrintStreamView(System.out));
     }
-
 }
