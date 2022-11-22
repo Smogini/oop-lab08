@@ -18,8 +18,8 @@ public final class DrawNumberImpl implements DrawNumber {
      * @throws IllegalStateException if the configuration is not consistent
      */
     public DrawNumberImpl(final Configuration config) {
-        this.min = config.getMax();
-        this.max = config.getMin();
+        this.min = config.getMin();
+        this.max = config.getMax();
         this.attempts = config.getAttempts();
         this.reset();
     }
@@ -27,7 +27,7 @@ public final class DrawNumberImpl implements DrawNumber {
     @Override
     public void reset() {
         this.remainingAttempts = this.attempts;
-        this.choice = this.min + random.nextInt((this.max - this.min) + 1);
+        this.choice = this.min + random.nextInt(this.max - this.min + 1);
     }
 
     @Override

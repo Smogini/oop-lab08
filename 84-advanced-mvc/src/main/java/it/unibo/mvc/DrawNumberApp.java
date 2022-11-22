@@ -17,7 +17,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
      * @param views
      *            the views to attach
      */
-    public DrawNumberApp(final String file, final DrawNumberView... views) {
+    public DrawNumberApp(final String path, final DrawNumberView... views) {
         /*
          * Side-effect proof
          */
@@ -27,7 +27,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             view.start();
         }
         Configuration.Builder builder = new Configuration.Builder();
-        try (final BufferedReader reader = new BufferedReader(new FileReader(file));) {
+        try (final BufferedReader reader = new BufferedReader(new FileReader(path))) {
             String line;
             String[] arr;
             int val;
@@ -41,7 +41,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
                 } else if (arr[0].contains("attempts")) {
                     builder.setAttempts(val);
                 } else {
-                    displayError("Cannot understand the values in " + file);
+                    displayError("Cannot understand the values in " + path);
                 }
             }
             reader.close();
@@ -49,7 +49,6 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
             displayError(e.getMessage());
         }
         final Configuration config = builder.build();
-        System.out.println(config.getAttempts() + " " + config.getMax() + " " + config.getMin());
         if (config.isConsistent()) {
            this.model = new DrawNumberImpl(config);
         } else {
